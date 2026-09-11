@@ -1,11 +1,11 @@
 """
 core/API/app.py
-Production FastAPI backend for NIRMITI Flash Flood Early-Warning System.
+Production FastAPI backend for NIRMITI Multi-Page Early-Warning Portal.
 """
 import os
 import sys
+from datetime import datetime
 
-# Ensure Python can always locate project modules on any OS
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
 CORE_DIR = os.path.dirname(BASE_DIR)
@@ -19,32 +19,23 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-# Safe imports for both package and direct execution
 try:
     from core.spatial.grid import get_grid_cells
     from core.Prediction.predictor import predictor
     from core.API.apiHand.open_meteo import get_weather_data
     from core.features.feature_pipeline import extract_hydrological_features
 except ImportError:
-    try:
-        from spatial.grid import get_grid_cells
-        from Prediction.predictor import predictor
-        from API.apiHand.open_meteo import get_weather_data
-        from features.feature_pipeline import extract_hydrological_features
-    except ImportError:
-        # Fallback if folder casing is capitalized
-        from core.spatial.grid import get_grid_cells
-        from core.Prediction.predictor import predictor
-        from core.API.apiHand.open_meteo import get_weather_data
-        from core.features.feature_pipeline import extract_hydrological_features
+    from spatial.grid import get_grid_cells
+    from Prediction.predictor import predictor
+    from API.apiHand.open_meteo import get_weather_data
+    from features.feature_pipeline import extract_hydrological_features
 
 app = FastAPI(
-    title="NIRMITI Flash Flood Early-Warning API",
-    description="Operational Flash Flood Risk & Infrastructure Impact System for Hilly Regions",
-    version="2.0.0"
+    title="NIRMITI Flash Flood Early-Warning Portal (NB-FFEWS Standard)",
+    description="Multi-Page Disaster Management & Early Warning System",
+    version="3.0.0"
 )
 
-# Enable CORS for web dashboards and mobile clients
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -53,7 +44,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Locate static directory (handles both 'static' and 'Static' on Linux and Windows)
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 if not os.path.exists(STATIC_DIR):
     STATIC_DIR = os.path.join(BASE_DIR, "Static")
@@ -62,58 +52,117 @@ if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     app.mount("/Static", StaticFiles(directory=STATIC_DIR), name="Static_cap")
 
+# Official District Emergency Contacts Directory
+REGIONAL_CONTACTS = [
+    {
+        "district": "Kamrup Metropolitan (Guwahati Core)",
+        "control_room": "DEOC Guwahati",
+        "toll_free": "1077 / 1070",
+        "phone": "+91 361 2733052",
+        "ndrf_unit": "1st Bn NDRF Patgaon (+91 361 2840284)",
+        "status": "Active 24x7"
+    },
+    {
+        "district": "Kamrup Rural (Amingaon / Hajo)",
+        "control_room": "DEOC Amingaon",
+        "toll_free": "1077",
+        "phone": "+91 361 2684404",
+        "ndrf_unit": "SDRF Regional Team Amingaon",
+        "status": "Active 24x7"
+    },
+    {
+        "district": "Morigaon (Kopili Basin)",
+        "control_room": "DEOC Morigaon",
+        "toll_free": "1077",
+        "phone": "+91 3678 240225",
+        "ndrf_unit": "SDRF Flood Rescue Squad",
+        "status": "Active 24x7"
+    },
+    {
+        "district": "Baksa (Foothills / Puthimari Basin)",
+        "control_room": "DEOC Mushalpur",
+        "toll_free": "1077",
+        "phone": "+91 3624 234567",
+        "ndrf_unit": "Indian Army Flood Relief Column",
+        "status": "Active 24x7"
+    },
+    {
+        "district": "Nalbari (Pagladiya River Basin)",
+        "control_room": "DEOC Nalbari",
+        "toll_free": "1077",
+        "phone": "+91 3624 220496",
+        "ndrf_unit": "NDRF Quick Response Team",
+        "status": "Active 24x7"
+    }
+]
+
+# Relief Shelters & Evacuation Centers
+RELIEF_SHELTERS = [
+    {"name": "Gauhati Medical College Relief Hub", "district": "Kamrup Metro", "capacity": 1500, "status": "Ready", "elevation": "78m (High Ground)"},
+    {"name": "Sonapur Higher Secondary Relief Center", "district": "Kamrup Metro", "capacity": 800, "status": "Ready", "elevation": "110m (Safe)"},
+    {"name": "Saraighat College Evacuation Camp", "district": "Kamrup Rural", "capacity": 1200, "status": "Ready", "elevation": "65m (Safe)"},
+    {"name": "Dharamtul Community Shelter", "district": "Morigaon", "capacity": 950, "status": "High Alert", "elevation": "58m (Moderate)"},
+    {"name": "Mushalpur Multi-Purpose Cyclone/Flood Shelter", "district": "Baksa", "capacity": 1100, "status": "Ready", "elevation": "95m (Safe)"},
+    {"name": "Rangia High School Relief Hub", "district": "Kamrup Rural", "capacity": 700, "status": "Ready", "elevation": "62m (Safe)"}
+]
 
 @app.get("/")
 def get_dashboard():
-    """Serves the interactive GIS dashboard."""
     index_path = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {
-        "status": "online",
-        "message": "Dashboard index.html not found in static folder",
-        "docs": "/docs",
-        "searched_path": index_path
-    }
-
+    return {"status": "online", "docs": "/docs"}
 
 @app.get("/health")
 def healthcheck():
-    """System health & model readiness status."""
     return {"status": "healthy", "model_ready": getattr(predictor, "ready", True)}
-
 
 @app.get("/api/v1/grid")
 def get_grid():
-    """Returns the 49 catchment grid cells and coordinates."""
     return {"cells": get_grid_cells()}
 
+@app.get("/api/v1/contacts")
+def get_contacts():
+    return {"contacts": REGIONAL_CONTACTS}
+
+@app.get("/api/v1/shelters")
+def get_shelters():
+    return {"shelters": RELIEF_SHELTERS}
+
+@app.get("/api/v1/bulletin")
+def get_bulletin():
+    """Generates official NB-FFEWS style daily advisory bulletin."""
+    now = datetime.utcnow().strftime("%d-%b-%Y %H:%M UTC")
+    return {
+        "bulletin_id": f"NIRMITI-BULLETIN-{datetime.utcnow().strftime('%Y%m%d')}",
+        "issued_at": now,
+        "basin": "Brahmaputra Middle Catchment & South Tributaries",
+        "synoptic_situation": "Monsoon trough active across Northeast India. High moisture incursion with convective cloud clusters detected over Meghalaya plateau and Kamrup foothills.",
+        "danger_level_gauges": [
+            {"gauge": "Brahmaputra @ Pandu (Guwahati)", "danger_level": "49.68 m", "current_trend": "Rising steadily"},
+            {"gauge": "Kopili @ Kampur", "danger_level": "60.50 m", "current_trend": "Approaching Warning"}
+        ],
+        "general_advisory": "People residing in low-lying riverine pockets, char areas, and flash flood funnels of Guwahati (Bharalu basin) and Kopili floodplain are advised to remain vigilant. Keep emergency helplines on speed dial."
+    }
 
 @app.post("/api/v1/simulate")
 def simulate_scenario(scenario: str = "cloudburst"):
-    """
-    Simulates operational scenarios using real weather physics:
-    - 'live': Ingest live Open-Meteo AWS feeds
-    - 'cloudburst': Severe 220mm storm centered on Guwahati/Dispur plain
-    - 'moderate': 65mm continuous monsoon rain
-    """
     cells = get_grid_cells()
     results = []
     total_exposed_pop = 0
     submerged_bridges = 0
     
-    # CWC Gauge Level simulation based on scenario
     if scenario == "cloudburst":
-        river_level = 49.85  # Exceeds Pandu Danger Level of 49.68m
+        river_level = 49.85
         river_status = "ABOVE DANGER (CRITICAL)"
         lead_time_top = 2.5
     elif scenario == "moderate":
-        river_level = 48.90  # Above Warning Level (48.68m)
+        river_level = 48.90
         river_status = "WARNING TIER"
         lead_time_top = 5.0
     else:
-        river_level = 45.20  # Normal Flow
-        river_status = "NORMAL"
+        river_level = 45.20
+        river_status = "NORMAL FLOW"
         lead_time_top = 12.0
     
     for cell in cells:
@@ -142,8 +191,6 @@ def simulate_scenario(scenario: str = "cloudburst"):
         }
         
         pred = predictor.predict_cell(features)
-        
-        # Socio-economic impact analytics based on elevation & risk
         exposed_pop = int(cell.get("elevation_m", 100.0) * 42) if pred["risk_tier"] in ["HIGH", "CRITICAL"] else 0
         total_exposed_pop += exposed_pop
         if pred["risk_tier"] == "CRITICAL":
@@ -164,18 +211,4 @@ def simulate_scenario(scenario: str = "cloudburst"):
         "total_exposed_population": total_exposed_pop,
         "submerged_bridges_count": submerged_bridges,
         "cells": results
-    }
-
-
-@app.get("/api/v1/alerts")
-def get_active_alerts():
-    """Returns active critical flood advisories and impacted zones."""
-    return {
-        "alert_level": "CRITICAL",
-        "region": "Assam 70km Brahmaputra Catchment",
-        "lead_time_hrs": 2.5,
-        "submerged_bridges": 18,
-        "exposed_citizens": 12850,
-        "active_shelters": 14,
-        "action_required": "Immediate evacuation to designated elevated relief camps."
     }

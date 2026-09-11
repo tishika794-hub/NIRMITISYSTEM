@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIRMITI - Flash Flood Early Warning & GIS Command Center</title>
+    <title>NIRMITI - Flash Flood Early Warning System (FFEWS)</title>
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,51 +12,233 @@
 </head>
 
 <body>
-    <!-- Top Metrics Ribbon -->
-    <header class="top-bar">
-        <div class="brand">🌊 <strong>NIRMITI</strong> Early Warning System</div>
-        <div class="metrics-ribbon">
-            <div class="metric-item">Rainfall (24h): <strong id="m-rain">142 mm</strong></div>
-            <div class="metric-item">River Gauge (Pandu): <strong id="m-river">4.6 m</strong></div>
-            <div class="metric-item">Flood Prob: <strong id="m-prob" style="color:#ef4444;">78%</strong></div>
-            <div class="metric-item">Danger Level: <strong id="m-danger" style="color:#ef4444;">Critical</strong></div>
-            <div class="metric-item">Est. Lead Time: <strong id="m-lead" style="color:#f59e0b;">2.5 hrs</strong></div>
+
+    <!-- Top Government Header Banner -->
+    <header class="portal-header">
+        <div class="header-main container">
+            <div class="brand-group">
+                <div class="brand-logo">🌊</div>
+                <div>
+                    <h1 class="portal-title">NIRMITI FLASH FLOOD EARLY WARNING SYSTEM</h1>
+                    <div class="portal-subtitle">Regional Multi-Source Hydro-Meteorological Early Warning & Disaster
+                        Response Portal</div>
+                </div>
+            </div>
+
+            <!-- National Emergency Helplines -->
+            <div class="quick-helpline">
+                <span class="helpline-badge">🚨 TOLL FREE 24/7</span>
+                <div>
+                    <strong>State Disaster Control: 1070 / 1079</strong><br />
+                    <small>District Emergency: 1077 | Police/Rescue: 112</small>
+                </div>
+            </div>
         </div>
+
+        <!-- Navigation Bar (Multi-Page Tabs) -->
+        <nav class="portal-nav">
+            <div class="nav-container container">
+                <button class="nav-tab active" onclick="switchPage('map-page')">🗺️ GIS Early Warning Map</button>
+                <button class="nav-tab" onclick="switchPage('bulletin-page')">📋 Daily Flood Bulletins &
+                    Outlook</button>
+                <button class="nav-tab" onclick="switchPage('contacts-page')">📞 Emergency Helplines & Regional
+                    DEOC</button>
+                <button class="nav-tab" onclick="switchPage('shelters-page')">🏥 Relief Shelters & Evacuation</button>
+                <button class="nav-tab" onclick="switchPage('about-page')">📘 Scientific Methodology & Models</button>
+            </div>
+        </nav>
     </header>
 
-    <div class="main-layout">
-        <!-- Sidebar Control Panel -->
-        <aside class="control-panel">
-            <h3>⚡ SCENARIO SIMULATOR</h3>
-            <button class="btn" onclick="runScenario('live')">🌤️ Operational Live Feed</button>
-            <button class="btn" onclick="runScenario('moderate')">🌧️ Monsoon Rain (65mm)</button>
-            <button class="btn btn-danger" onclick="runScenario('cloudburst')">⛈️ Guwahati Cloudburst (220mm)</button>
-
-            <hr class="divider" />
-
-            <h3>📊 DISASTER IMPACT METRICS</h3>
-            <div class="stat-card"><span>People at Risk:</span> <strong id="stat-pop">12,850</strong></div>
-            <div class="stat-card"><span>Villages at Risk:</span> <strong id="stat-villages">26</strong></div>
-            <div class="stat-card"><span>Critical Infrastructure:</span> <strong id="stat-infra">18 Submerged</strong>
+    <!-- PAGE 1: GIS COMMAND MAP & TELEMETRY -->
+    <section id="map-page" class="portal-page active">
+        <!-- Telemetry Ribbon -->
+        <div class="telemetry-bar">
+            <div class="telemetry-item">
+                <span class="t-label">24h Max Rainfall</span>
+                <strong class="t-value" id="m-rain">142 mm</strong>
             </div>
-            <div class="stat-card"><span>Open Shelters:</span> <strong style="color:#22c55e;">14 Ready</strong></div>
+            <div class="telemetry-item">
+                <span class="t-label">CWC River Gauge (Pandu)</span>
+                <strong class="t-value" id="m-river">4.6 m</strong>
+            </div>
+            <div class="telemetry-item">
+                <span class="t-label">Max Flood Probability</span>
+                <strong class="t-value" id="m-prob" style="color: #ef4444;">78%</strong>
+            </div>
+            <div class="telemetry-item">
+                <span class="t-label">Catchment Risk Level</span>
+                <strong class="t-value" id="m-danger" style="color: #ef4444;">CRITICAL</strong>
+            </div>
+            <div class="telemetry-item">
+                <span class="t-label">Estimated Lead Time (Tc)</span>
+                <strong class="t-value" id="m-lead" style="color: #f59e0b;">2.5 hrs</strong>
+            </div>
+        </div>
 
-            <hr class="divider" />
+        <div class="map-layout">
+            <!-- Sidebar Controls -->
+            <aside class="map-sidebar">
+                <h3>⚡ SCENARIO SIMULATOR</h3>
+                <div class="btn-group">
+                    <button class="sim-btn" onclick="runScenario('live')">🌤️ Operational Live Feed</button>
+                    <button class="sim-btn" onclick="runScenario('moderate')">🌧️ Monsoon Rain (65mm)</button>
+                    <button class="sim-btn btn-severe" onclick="runScenario('cloudburst')">⛈️ Guwahati Cloudburst
+                        (220mm)</button>
+                </div>
 
-            <h3>📢 RESPONSE WORKFLOW</h3>
-            <div class="workflow-steps">
-                <div class="step-item">✅ 1. Flood Detected (AI Alert)</div>
-                <div class="step-item">✅ 2. District Authorities Alerted</div>
-                <div class="step-item">✅ 3. NGOs & Social Workers Notified</div>
-                <div class="step-item">✅ 4. Safe Evacuation Routes Active</div>
+                <hr class="divider" />
+
+                <h3>📊 REAL-TIME IMPACT ASSESSMENT</h3>
+                <div class="impact-stat"><span>Citizens at Risk:</span> <strong id="stat-pop">12,850</strong></div>
+                <div class="impact-stat"><span>Vulnerable Villages:</span> <strong id="stat-villages">26</strong></div>
+                <div class="impact-stat"><span>Submerged Bridges:</span> <strong id="stat-infra">18 Critical</strong>
+                </div>
+                <div class="impact-stat"><span>Available Relief Shelters:</span> <strong style="color:#22c55e;">14
+                        Active</strong></div>
+
+                <hr class="divider" />
+
+                <h3>📢 6-STEP RESPONSE DISPATCH</h3>
+                <div class="workflow-box">
+                    <div>✅ 1. AI Flash Flood Detected</div>
+                    <div>✅ 2. District Magistrates Alerted</div>
+                    <div>✅ 3. NDRF & SDRF Mobilized</div>
+                    <div>✅ 4. SMS Alerts to Village Heads</div>
+                </div>
+
+                <button class="dispatch-btn" onclick="dispatchAlerts()">🚨 DISPATCH ADVISORY BROADCAST</button>
+            </aside>
+
+            <!-- Leaflet GIS Map -->
+            <main id="map" class="map-box"></main>
+        </div>
+    </section>
+
+    <!-- PAGE 2: DAILY FLOOD BULLETINS & OUTLOOK -->
+    <section id="bulletin-page" class="portal-page container">
+        <div class="page-card">
+            <h2 class="section-title">📋 Official Hydro-Meteorological Flood Forecast Bulletin</h2>
+            <div class="bulletin-header">
+                <div><strong>Bulletin ID:</strong> <span id="b-id">NIRMITI-BULLETIN-2026</span></div>
+                <div><strong>Issued At:</strong> <span id="b-time">Loading...</span></div>
+                <div><strong>Basin:</strong> Middle Brahmaputra & Southern Tributaries</div>
             </div>
 
-            <button class="btn btn-alert" onclick="dispatchAlerts()">🚨 DISPATCH ADVISORIES</button>
-        </aside>
+            <div class="bulletin-content">
+                <h3>1. Synoptic Weather Situation</h3>
+                <p id="b-synoptic">Active monsoon troughing over Northeast India. High convective cloudburst potential
+                    over Kamrup, Baksa, and Morigaon foothills.</p>
 
-        <!-- Interactive GIS Map -->
-        <main id="map" class="map-container"></main>
-    </div>
+                <h3>2. River Gauge Threshold Status (Central Water Commission)</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Station Name</th>
+                                <th>River</th>
+                                <th>Danger Level</th>
+                                <th>Current Trend</th>
+                                <th>Alert Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pandu (Guwahati)</td>
+                                <td>Brahmaputra</td>
+                                <td>49.68 m</td>
+                                <td>Rising Steadily</td>
+                                <td><span class="badge red">ABOVE DANGER</span></td>
+                            </tr>
+                            <tr>
+                                <td>Kampur</td>
+                                <td>Kopili</td>
+                                <td>60.50 m</td>
+                                <td>Approaching</td>
+                                <td><span class="badge orange">WATCH TIER</span></td>
+                            </tr>
+                            <tr>
+                                <td>NH-31 Crossing</td>
+                                <td>Puthimari</td>
+                                <td>51.81 m</td>
+                                <td>Near Normal</td>
+                                <td><span class="badge green">NORMAL</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>3. Actionable Disaster Advisory</h3>
+                <div class="advisory-box" id="b-advisory">
+                    All emergency response units, NDRF 1st Bn, and local ASHA disaster volunteers are advised to keep
+                    low-lying settlements along Bharalu basin and Saraighat North on high alert.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 3: EMERGENCY HELPLINES & REGIONAL DIRECTORY -->
+    <section id="contacts-page" class="portal-page container">
+        <div class="page-card">
+            <h2 class="section-title">📞 Regional Emergency Helplines & District Control Rooms</h2>
+            <p style="color:#94a3b8; font-size:14px;">Direct 24x7 emergency contacts for District Emergency Operations
+                Centers (DEOC) and NDRF Rescue Units:</p>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>District Name</th>
+                            <th>Control Room</th>
+                            <th>Toll-Free Helpline</th>
+                            <th>Phone Number</th>
+                            <th>Assigned NDRF/SDRF Unit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contacts-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 4: RELIEF SHELTERS & EVACUATION HUBS -->
+    <section id="shelters-page" class="portal-page container">
+        <div class="page-card">
+            <h2 class="section-title">🏥 Active Relief Shelters & Evacuation Centers</h2>
+            <p style="color:#94a3b8; font-size:14px;">Pre-designated high-ground cyclone/flood relief centers with
+                drinking water, medical aid, and power backups:</p>
+
+            <div class="shelter-grid" id="shelters-grid">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 5: SCIENTIFIC METHODOLOGY -->
+    <section id="about-page" class="portal-page container">
+        <div class="page-card">
+            <h2 class="section-title">📘 Scientific Architecture & Hydrological Modeling</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>🛰️ Multi-Source Ingestion</h3>
+                    <p>Combines real-time ECMWF / Open-Meteo precipitation, Copernicus ERA5 soil moisture (0-7cm), and
+                        ISRO/NASA 30m Digital Elevation Models (DEM).</p>
+                </div>
+                <div class="about-card">
+                    <h3>🧠 Machine Learning (XGBoost)</h3>
+                    <p>Trained on official 2020-2025 ASDMA flood bulletins and CWC danger level records with $>90\%$
+                        ROC-AUC and $>88\%$ disaster capture recall.</p>
+                </div>
+                <div class="about-card">
+                    <h3>⏱️ Lead Time Estimation (Tc)</h3>
+                    <p>Uses Kirpich's hydrological concentration formula ($T_c = 0.01947 \cdot L^{0.77} \cdot
+                        S^{-0.385}$) to give authorities 2.0 to 4.0 hours of advance warning.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="/static/dashboard.js"></script>
 </body>

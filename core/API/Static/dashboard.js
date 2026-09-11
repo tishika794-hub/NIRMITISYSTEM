@@ -1,3 +1,4 @@
+// Initialize Leaflet Map over Assam catchment
 const map = L.map('map').setView([26.25, 91.75], 10);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -6,6 +7,19 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 let cellLayers = [];
+
+// Tab Switcher
+function switchPage(pageId) {
+    document.querySelectorAll('.portal-page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById(pageId).classList.add('active');
+    event.target.classList.add('active');
+
+    if (pageId === 'map-page') {
+        setTimeout(() => map.invalidateSize(), 200);
+    }
+}
 
 function getTierColor(tier) {
     switch (tier) {
@@ -16,11 +30,13 @@ function getTierColor(tier) {
     }
 }
 
+// Run Scenario Simulation
 async function runScenario(scenarioType) {
     try {
         const res = await fetch(`/api/v1/simulate?scenario=${scenarioType}`, { method: 'POST' });
         const data = await res.json();
 
+        // Update Ribbon Telemetry
         document.getElementById('m-river').innerText = `${data.river_level_m} m`;
         document.getElementById('m-lead').innerText = `${data.lead_time_top_hrs} hrs`;
 
@@ -32,15 +48,18 @@ async function runScenario(scenarioType) {
         });
 
         document.getElementById('m-prob').innerText = `${(highestProb * 100).toFixed(0)}%`;
-        document.getElementById('m-danger').innerText = highestProb >= 0.8 ? "Critical" : highestProb >= 0.55 ? "High Alert" : "Moderate";
+        document.getElementById('m-danger').innerText = highestProb >= 0.8 ? "CRITICAL" : highestProb >= 0.55 ? "HIGH" : "MODERATE";
 
+        // Update Sidebar Stats
         document.getElementById('stat-pop').innerText = data.total_exposed_population.toLocaleString();
         document.getElementById('stat-villages').innerText = critCount;
-        document.getElementById('stat-infra').innerText = `${data.submerged_bridges_count} Submerged`;
+        document.getElementById('stat-infra').innerText = `${data.submerged_bridges_count} Critical`;
 
+        // Clear Map Layers
         cellLayers.forEach(l => map.removeLayer(l));
         cellLayers = [];
 
+        // Render 49 Cells on Map
         data.cells.forEach(cell => {
             const color = getTierColor(cell.risk_tier);
             const radius = 4500;
@@ -58,11 +77,11 @@ async function runScenario(scenarioType) {
                     <strong style="font-size: 14px;">${cell.name}</strong><hr style="margin: 4px 0;"/>
                     <b>Type:</b> ${cell.location_type}<br/>
                     <b>Risk Level:</b> <span style="color:${color}; font-weight:bold;">${cell.risk_tier}</span> (${(cell.flood_probability * 100).toFixed(1)}%)<br/>
-                    <b>24h Rainfall:</b> ${cell.rainfall_24h} mm<br/>
+                    <b>24h Rain:</b> ${cell.rainfall_24h} mm<br/>
                     <b>Elevation:</b> ${cell.elevation_m} m | <b>Slope:</b> ${cell.slope_deg}°<br/>
                     <b>Est. Lead Time:</b> ${cell.estimated_lead_time_hrs} hrs<br/>
                     <b>Exposed Citizens:</b> ${cell.exposed_population}<br/>
-                    <b>Open Shelters:</b> ${cell.shelters} Active
+                    <b>Open Shelters:</b> ${cell.shelters} Ready
                 </div>
             `);
 
@@ -73,8 +92,60 @@ async function runScenario(scenarioType) {
     }
 }
 
-function dispatchAlerts() {
-    alert("🚨 NIRMITI Emergency Advisory Broadcast Dispatched!\n\n• District Magistrate: Alerted via CAP Protocol\n• NDRF & SDRF: Mobilization coordinates shared\n• Local Villagers: 12,850 Geo-fenced SMS & WhatsApp alerts sent in Assamese/Hindi.");
+// Load Contacts & Shelters dynamically
+async function loadPortalData() {
+    try {
+        // 1. Load Contacts
+        const resContacts = await fetch('/api/v1/contacts');
+        const dataContacts = await resContacts.json();
+        const tbody = document.getElementById('contacts-table-body');
+        tbody.innerHTML = '';
+        dataContacts.contacts.forEach(c => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${c.district}</strong></td>
+                    <td>${c.control_room}</td>
+                    <td><strong style="color:#ef4444;">${c.toll_free}</strong></td>
+                    <td><a href="tel:${c.phone}" style="color:#38bdf8; text-decoration:none;">${c.phone}</a></td>
+                    <td>${c.ndrf_unit}</td>
+                    <td><span class="badge green">${c.status}</span></td>
+                </tr>
+            `;
+        });
+
+        // 2. Load Shelters
+        const resShelters = await fetch('/api/v1/shelters');
+        const dataShelters = await resShelters.json();
+        const shelterGrid = document.getElementById('shelters-grid');
+        shelterGrid.innerHTML = '';
+        dataShelters.shelters.forEach(s => {
+            shelterGrid.innerHTML += `
+                <div class="shelter-card">
+                    <h4>${s.name}</h4>
+                    <p><b>District:</b> ${s.district}</p>
+                    <p><b>Capacity:</b> ${s.capacity} people</p>
+                    <p><b>Terrain Elevation:</b> ${s.elevation}</p>
+                    <p><b>Status:</b> <span class="badge ${s.status === 'Ready' ? 'green' : 'orange'}">${s.status}</span></p>
+                </div>
+            `;
+        });
+
+        // 3. Load Bulletin
+        const resBulletin = await fetch('/api/v1/bulletin');
+        const dataBulletin = await resBulletin.json();
+        document.getElementById('b-id').innerText = dataBulletin.bulletin_id;
+        document.getElementById('b-time').innerText = dataBulletin.issued_at;
+        document.getElementById('b-synoptic').innerText = dataBulletin.synoptic_situation;
+        document.getElementById('b-advisory').innerText = dataBulletin.general_advisory;
+    } catch (e) {
+        console.error("Portal data loading error:", e);
+    }
 }
 
+function dispatchAlerts() {
+    alert("🚨 NIRMITI Emergency Advisory Broadcast Dispatched!\n\n• District Emergency Operations Centers (DEOC): Alerted via CAP\n• 1st Bn NDRF Guwahati: Mobilization coordinates sent\n• 12,850 Citizens: Geo-fenced SMS dispatched in Assamese/Hindi.");
+}
+
+// Initial Load
 runScenario('cloudburst');
+loadPortalData();
