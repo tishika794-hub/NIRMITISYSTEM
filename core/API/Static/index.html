@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIRMITI - Flash Flood Early Warning & GIS Command Center</title>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+
+<body>
+    <!-- Top Metrics Ribbon -->
+    <header class="top-bar">
+        <div class="brand">🌊 <strong>NIRMITI</strong> Early Warning System</div>
+        <div class="metrics-ribbon">
+            <div class="metric-item">Rainfall (24h): <strong id="m-rain">142 mm</strong></div>
+            <div class="metric-item">River Gauge (Pandu): <strong id="m-river">4.6 m</strong></div>
+            <div class="metric-item">Flood Prob: <strong id="m-prob" style="color:#ef4444;">78%</strong></div>
+            <div class="metric-item">Danger Level: <strong id="m-danger" style="color:#ef4444;">Critical</strong></div>
+            <div class="metric-item">Est. Lead Time: <strong id="m-lead" style="color:#f59e0b;">2.5 hrs</strong></div>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- Sidebar Control Panel -->
+        <aside class="control-panel">
+            <h3>⚡ SCENARIO SIMULATOR</h3>
+            <button class="btn" onclick="runScenario('live')">🌤️ Operational Live Feed</button>
+            <button class="btn" onclick="runScenario('moderate')">🌧️ Monsoon Rain (65mm)</button>
+            <button class="btn btn-danger" onclick="runScenario('cloudburst')">⛈️ Guwahati Cloudburst (220mm)</button>
+
+            <hr class="divider" />
+
+            <h3>📊 DISASTER IMPACT METRICS</h3>
+            <div class="stat-card"><span>People at Risk:</span> <strong id="stat-pop">12,850</strong></div>
+            <div class="stat-card"><span>Villages at Risk:</span> <strong id="stat-villages">26</strong></div>
+            <div class="stat-card"><span>Critical Infrastructure:</span> <strong id="stat-infra">18 Submerged</strong>
+            </div>
+            <div class="stat-card"><span>Open Shelters:</span> <strong style="color:#22c55e;">14 Ready</strong></div>
+
+            <hr class="divider" />
+
+            <h3>📢 RESPONSE WORKFLOW</h3>
+            <div class="workflow-steps">
+                <div class="step-item">✅ 1. Flood Detected (AI Alert)</div>
+                <div class="step-item">✅ 2. District Authorities Alerted</div>
+                <div class="step-item">✅ 3. NGOs & Social Workers Notified</div>
+                <div class="step-item">✅ 4. Safe Evacuation Routes Active</div>
+            </div>
+
+            <button class="btn btn-alert" onclick="dispatchAlerts()">🚨 DISPATCH ADVISORIES</button>
+        </aside>
+
+        <!-- Interactive GIS Map -->
+        <main id="map" class="map-container"></main>
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+{
+  "features": [
+    "rain_1h",
+    "rain_3h",
+    "rain_6h",
+    "rain_24h",
+    "rain_72h",
+    "rain_intensity",
+    "rain_acceleration",
+    "soil_moisture_surface",
+    "soil_saturation_index",
+    "antecedent_rain_48h",
+    "elevation_m",
+    "slope_deg"
+  ],
+  "test_roc_auc": 0.9999,
+  "test_recall": 1.0,
+  "test_precision": 0.9744,
+  "test_f1": 0.987
+}
