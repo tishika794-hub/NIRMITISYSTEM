@@ -34,8 +34,8 @@ except ImportError:
 # =============================================================================
 # 🚨 TELEGRAM CONFIGURATION (PUT YOUR TOKEN AND CHAT ID HERE)
 # =============================================================================
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "YOUR_CHAT_ID_HERE")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8747087552:AAFmkLo7G2WX3BiL4gDKbvv4RhjPHwmV6qI")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "8350579147")
 
 def send_telegram_alert(message: str) -> bool:
     """Sends real instant Telegram notification."""
