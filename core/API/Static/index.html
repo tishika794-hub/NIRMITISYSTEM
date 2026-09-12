@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NIRMITI - Flash Flood Early Warning System (FFEWS)</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link rel="apple-touch-icon" href="/static/logo.png">
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -13,11 +16,42 @@
 
 <body>
 
+    <!-- ========================================== -->
+    <!-- 🌊 NIRMITI ANIMATED SPLASH SCREEN (INTRO) -->
+    <!-- ========================================== -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-backdrop"></div>
+        <div class="splash-content">
+            <div class="splash-logo-wrapper">
+                <div class="splash-radar-pulse pulse-1"></div>
+                <div class="splash-radar-pulse pulse-2"></div>
+                <div class="splash-radar-pulse pulse-3"></div>
+                <div class="splash-logo-aura"></div>
+                <img src="/static/logo.png" alt="NIRMITI Flood Prediction Logo" class="splash-logo-img" />
+            </div>
+            
+            <h1 class="splash-brand-title">NIRMITI</h1>
+            <p class="splash-brand-subtitle">FLASH FLOOD EARLY WARNING SYSTEM</p>
+            <div class="splash-tagline">AI-Powered Hydro-Meteorological Early Warning & Disaster Response</div>
+            
+            <div class="splash-loading-box">
+                <div class="splash-progress-track">
+                    <div class="splash-progress-fill" id="splash-progress"></div>
+                </div>
+                <div class="splash-status-text" id="splash-status">Connecting Telemetry & AI Hydrological Models...</div>
+            </div>
+
+            <button class="splash-skip-btn" onclick="dismissSplash()" title="Skip Intro">Skip to Dashboard &rarr;</button>
+        </div>
+    </div>
+
     <!-- Top Government Header Banner -->
     <header class="portal-header">
         <div class="header-main container">
             <div class="brand-group">
-                <div class="brand-logo">🌊</div>
+                <div class="brand-logo">
+                    <img src="/static/logo.png" alt="NIRMITI Logo" class="portal-logo-img" />
+                </div>
                 <div>
                     <h1 class="portal-title">NIRMITI FLASH FLOOD EARLY WARNING SYSTEM</h1>
                     <div class="portal-subtitle">Regional Multi-Source Hydro-Meteorological Early Warning & Disaster

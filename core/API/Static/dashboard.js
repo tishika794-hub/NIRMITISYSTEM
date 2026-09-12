@@ -167,6 +167,78 @@ async function dispatchAlerts() {
 }
 
 
+// =============================================================================
+// 🌊 NIRMITI SPLASH SCREEN ANIMATION & DISMISS CONTROLLER
+// =============================================================================
+let splashDismissed = false;
+
+function dismissSplash() {
+    if (splashDismissed) return;
+    splashDismissed = true;
+
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+        splash.classList.add('vanish');
+        setTimeout(() => {
+            splash.style.display = 'none';
+            if (typeof map !== 'undefined' && map.invalidateSize) {
+                map.invalidateSize();
+            }
+        }, 850);
+    }
+}
+
+function initSplashScreen() {
+    const progressFill = document.getElementById('splash-progress');
+    const statusText = document.getElementById('splash-status');
+
+    if (!progressFill || !statusText) {
+        setTimeout(dismissSplash, 2000);
+        return;
+    }
+
+    // Stage 1: Initial
+    progressFill.style.width = '25%';
+
+    // Stage 2: Ingest data
+    setTimeout(() => {
+        if (!splashDismissed) {
+            progressFill.style.width = '60%';
+            statusText.innerText = "Ingesting ECMWF Precipitation & Copernicus Soil Data...";
+        }
+    }, 650);
+
+    // Stage 3: Calibrate Models
+    setTimeout(() => {
+        if (!splashDismissed) {
+            progressFill.style.width = '88%';
+            statusText.innerText = "Calibrating XGBoost Spatial Risk Vectors & CWC Gauges...";
+        }
+    }, 1350);
+
+    // Stage 4: Ready & Fade Out
+    setTimeout(() => {
+        if (!splashDismissed) {
+            progressFill.style.width = '100%';
+            statusText.innerText = "System Armed. Entering Early Warning Portal...";
+        }
+    }, 1950);
+
+    // Stage 5: Vanish into main UI
+    setTimeout(() => {
+        dismissSplash();
+    }, 2400);
+}
+
+// Support pressing ESC or Space to skip intro
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+        dismissSplash();
+    }
+});
+
 // Initial Load
+initSplashScreen();
 runScenario('cloudburst');
 loadPortalData();
+

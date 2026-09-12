@@ -50,7 +50,25 @@ body {
 }
 
 .brand-logo {
-    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.portal-logo-img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 2px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    background: #061120;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portal-logo-img:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
 }
 
 .portal-title {
@@ -405,4 +423,259 @@ body {
     font-size: 13px;
     color: var(--text-dim);
     line-height: 1.5;
+}
+
+/* =============================================================================
+   🌊 NIRMITI ANIMATED SPLASH SCREEN (INTRO)
+   ============================================================================= */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #0c203b 0%, #060e1d 55%, #020610 100%);
+    overflow: hidden;
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.splash-screen.vanish {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(1.04);
+}
+
+.splash-backdrop {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.splash-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    max-width: 580px;
+    width: 90%;
+    animation: splashContentIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.splash-logo-wrapper {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.splash-logo-img {
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #08162b;
+    border: 3px solid rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 35px rgba(56, 189, 248, 0.4), inset 0 0 15px rgba(56, 189, 248, 0.2);
+    position: relative;
+    z-index: 5;
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+.splash-logo-aura {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, transparent 70%);
+    filter: blur(10px);
+    z-index: 2;
+    animation: auraPulse 2.5s ease-in-out infinite alternate;
+}
+
+/* Radar Wave Pulses */
+.splash-radar-pulse {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    z-index: 1;
+    pointer-events: none;
+    animation: radarRipple 2.6s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+.pulse-1 {
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+}
+
+.pulse-2 {
+    width: 150px;
+    height: 150px;
+    animation-delay: 0.85s;
+}
+
+.pulse-3 {
+    width: 150px;
+    height: 150px;
+    animation-delay: 1.7s;
+}
+
+.splash-brand-title {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(56, 189, 248, 0.7), 0 0 10px rgba(56, 189, 248, 0.9);
+    margin: 0 0 8px 0;
+    text-indent: 10px; /* balance letter-spacing */
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.splash-brand-subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #38bdf8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    text-indent: 4px;
+}
+
+.splash-tagline {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+}
+
+.splash-loading-box {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.splash-progress-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.splash-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #22c55e);
+    border-radius: 999px;
+    box-shadow: 0 0 12px #38bdf8;
+    transition: width 0.25s ease-out;
+}
+
+.splash-status-text {
+    font-size: 12px;
+    color: #cbd5e1;
+    letter-spacing: 0.4px;
+    min-height: 18px;
+    transition: all 0.2s ease;
+}
+
+.splash-skip-btn {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #94a3b8;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    z-index: 100000;
+}
+
+.splash-skip-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
+    color: #ffffff;
+    border-color: #38bdf8;
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+}
+
+/* Splash Keyframe Animations */
+@keyframes splashContentIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes auraPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.15);
+        opacity: 0.9;
+    }
+}
+
+@keyframes radarRipple {
+    0% {
+        width: 140px;
+        height: 140px;
+        opacity: 0.9;
+        transform: scale(1);
+    }
+    100% {
+        width: 320px;
+        height: 320px;
+        opacity: 0;
+        transform: scale(1.3);
+    }
 }

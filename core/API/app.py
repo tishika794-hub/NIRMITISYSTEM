@@ -140,6 +140,13 @@ def get_dashboard():
         return FileResponse(index_path)
     return {"status": "online", "docs": "/docs"}
 
+@app.get("/favicon.ico")
+def get_favicon():
+    logo_path = os.path.join(STATIC_DIR, "logo.png")
+    if os.path.exists(logo_path):
+        return FileResponse(logo_path, media_type="image/png")
+    return {"status": "none"}
+
 @app.get("/health")
 def healthcheck():
     return {"status": "healthy", "model_ready": getattr(predictor, "ready", True)}
